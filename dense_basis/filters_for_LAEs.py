@@ -62,7 +62,7 @@ def get_FWHM(a_filter):
     
     return wavelength[index[-1]], wavelength[index[0]]
 
-def choose_filters_laes(filter_list, filt_dir)
+def choose_filters_laes(filter_list, filt_dir, z)
 
   filter_data = np.genfromtxt((filt_dir+filter_list), skip_header=0,skip_footer=0, names=None, dtype=None, delimiter=' ')
   
