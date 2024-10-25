@@ -5,7 +5,7 @@ from numpy import asarray
 from astropy.utils.data import get_pkg_data_filename
 import scipy.integrate as it
 
-def get_eff_wavelength_new(filt_dir, filter_transmission):
+def get_eff_wavelength_new(filter_transmission, filt_dir):
     filt_transmission_data = get_pkg_data_filename(filt_dir + filter_transmission)
 
     filt_wav = (np.array([x.split()[0] for x in open(filt_transmission_data).readlines()])).astype(float)
@@ -28,7 +28,7 @@ def get_eff_wavelength_new(filt_dir, filter_transmission):
     
     return filt_eff
 
-def get_FWHM(filt_dir, a_filter):
+def get_FWHM(a_filter, filt_dir):
     filt_transmission_data = get_pkg_data_filename(filt_dir + a_filter)
 
     wavelength = (np.array([x.split()[0] for x in open(filt_transmission_data).readlines()])).astype(float)
@@ -80,12 +80,12 @@ def choose_filters_laes(filter_list, filt_dir, z):
   for a_filter in filter_data_orig:
       print(get_filter_name(a_filter))
       all_filts_names.append(get_filter_name(a_filter))
-      FWHM_max, FWHM_min = get_FWHM(a_filter)
+      FWHM_max, FWHM_min = get_FWHM(a_filter, filt_dir)
       print("upper FWHM:", FWHM_max, "A")
       print("lower FWHM:",FWHM_min, "A")
       FWHM = FWHM_max - FWHM_min
       print("FWHM:", round(FWHM, 2), "A")
-      eff_wave = get_eff_wavelength_new(a_filter)
+      eff_wave = get_eff_wavelength_new(a_filter, filt_dir)
       eff_waves.append(eff_wave)
       print("eff_wave:", round(eff_wave, 2))
       if ((((wave_lya > FWHM_max) or (wave_lya < FWHM_min)) or (FWHM > FWHM_max_thresh)) and (get_filter_name(a_filter) != "f43_IRAC_ch4_2" and get_filter_name(a_filter) != "f42_IRAC_ch3_2")):
@@ -106,13 +106,13 @@ def choose_filters_laes(filter_list, filt_dir, z):
   if len(omitted_filts) == 1: 
       print(len(omitted_filts), "filter has been omitted:")
       for filt in omitted_filts:
-          print(get_filter_name(filt), round(get_eff_wavelength_new(filt), 2))
+          print(get_filter_name(filt), round(get_eff_wavelength_new(filt, filt_dir), 2))
           omitted_filts_names.append(get_filter_name(filt))
           
   if len(omitted_filts) > 1: 
       print(len(omitted_filts), "filters have been omitted:")
       for filt in omitted_filts:
-          print(get_filter_name(filt), round(get_eff_wavelength_new(filt), 2))
+          print(get_filter_name(filt), round(get_eff_wavelength_new(filt, filt_dir), 2))
           omitted_filts_names.append(get_filter_name(filt))
   
   return filters_use_bool
