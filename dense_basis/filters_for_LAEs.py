@@ -1,94 +1,9 @@
 #imports
 
 import numpy as np
-import os.path as op
-import os
-import glob
-
-import astropy.units as u
-from astropy.coordinates import SkyCoord
-from astropy.table import Table, unique, vstack, join
-from astropy.io import fits
-from astropy.io import ascii, fits
-
-import tkinter as tk
-from tkinter import *
-import tkinter.messagebox
-import tkinter.font as font
-
-import random
-
-import pandas as pd
-
-import os
-
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import matplotlib.patheffects as pe
-
-import numpy as np
 from numpy import asarray
-from numpy import savetxt
-from numpy import loadtxt
-
-from astropy.io import fits
 from astropy.utils.data import get_pkg_data_filename
-from astroML.plotting import scatter_contour
-from astropy.table import Table, Column
-from astropy.coordinates import SkyCoord
-from astropy import units
-from astropy.cosmology import Planck15 as cosmo
-
-from scipy.stats import gaussian_kde
-import scipy.stats as st
-from scipy.interpolate import interp1d
-from scipy.optimize import curve_fit
-from scipy.integrate import simpson
-from scipy.ndimage import gaussian_filter1d
-
-import statistics
-
-from IPython.display import display, HTML
-
-# import pyregion
-
-from tqdm.auto import tqdm
-
-import statsmodels.api as sm
-
-from PIL import Image, ImageOps
-
-import seaborn as sns
-
-import csv
-
-import warnings
-warnings.filterwarnings('ignore')
-warnings.simplefilter('ignore')
-
-from IPython.display import Image as Images
-
-# from __future__ import print_function
-# from dustmaps.config import config
-# config['data_dir'] = "/Users/nicolefirestone/opt/anaconda3/lib/python3.9/site-packages/dustmaps/data/sfd"
-#if the line below throws an error, reinstall dustmaps (pip install dustmaps) 
-#because it requires specific versions of other installations
-# import dustmaps.sfd
-# dustmaps.sfd.fetch()
-# from dustmaps.sfd import SFDQuery
-
-import time
-
-import sys
-#from IPython.display import Audio
-#sound_file = '/Users/nicolefirestone/Downloads/chimes.mp3'
-
-from astropy.table import Table # astropy.table knows what a .fits file is
-
 import scipy.integrate as it
-
-import re
-from scipy.signal import find_peaks
 
 def get_eff_wavelength_new(filt_dir, filter_transmission):
     filt_transmission_data = get_pkg_data_filename(filt_dir + filter_transmission)
