@@ -90,8 +90,8 @@ import scipy.integrate as it
 import re
 from scipy.signal import find_peaks
 
-def get_eff_wavelength_new(filter_transmission):
-    filt_transmission_data = get_pkg_data_filename('/Users/nicolefirestone/Desktop/grd_scl/dense_basis/dense_basis/build/lib/dense_basis/filters/' + filter_transmission)
+def get_eff_wavelength_new(filt_dir, filter_transmission):
+    filt_transmission_data = get_pkg_data_filename(filt_dir + filter_transmission)
 
     filt_wav = (np.array([x.split()[0] for x in open(filt_transmission_data).readlines()])).astype(float)
     filt = (np.array([x.split()[1] for x in open(filt_transmission_data).readlines()])).astype(float)
@@ -113,8 +113,8 @@ def get_eff_wavelength_new(filter_transmission):
     
     return filt_eff
 
-def get_FWHM(a_filter):
-    filt_transmission_data = get_pkg_data_filename('/Users/nicolefirestone/Desktop/grd_scl/dense_basis/dense_basis/build/lib/dense_basis/filters/' + a_filter)
+def get_FWHM(filt_dir, a_filter):
+    filt_transmission_data = get_pkg_data_filename(filt_dir + a_filter)
 
     wavelength = (np.array([x.split()[0] for x in open(filt_transmission_data).readlines()])).astype(float)
     transmission = (np.array([x.split()[1] for x in open(filt_transmission_data).readlines()])).astype(float)
