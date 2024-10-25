@@ -6,7 +6,7 @@ from astropy.utils.data import get_pkg_data_filename
 import scipy.integrate as it
 
 def get_eff_wavelength_new(filter_transmission, filt_dir):
-    filt_transmission_data = get_pkg_data_filename(filt_dir + filter_transmission)
+    filt_transmission_data = filt_dir + filter_transmission #get_pkg_data_filename(filt_dir + filter_transmission)
 
     filt_wav = (np.array([x.split()[0] for x in open(filt_transmission_data).readlines()])).astype(float)
     filt = (np.array([x.split()[1] for x in open(filt_transmission_data).readlines()])).astype(float)
@@ -29,7 +29,7 @@ def get_eff_wavelength_new(filter_transmission, filt_dir):
     return filt_eff
 
 def get_FWHM(a_filter, filt_dir):
-    filt_transmission_data = get_pkg_data_filename(filt_dir + a_filter)
+    filt_transmission_data = filt_dir + a_filter #get_pkg_data_filename(filt_dir + a_filter)
 
     wavelength = (np.array([x.split()[0] for x in open(filt_transmission_data).readlines()])).astype(float)
     transmission = (np.array([x.split()[1] for x in open(filt_transmission_data).readlines()])).astype(float)
