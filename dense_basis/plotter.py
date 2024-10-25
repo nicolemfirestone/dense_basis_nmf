@@ -21,6 +21,11 @@ def set_plot_style():
     rcParams['xtick.major.width'] = 3
     rcParams['ytick.major.width'] = 3
 
+    #nicole
+    plt.rcParams.update({'font.sans-serif':'Times New Roman'})
+    plt.rcParams.update({'font.weight':'bold'})
+    plt.rcParams.update({'axes.labelweight':'bold'})
+
 def plot_sfh(timeax, sfh, lookback = False, logx = False, logy = False, fig = None, label=None, **kwargs):
     set_plot_style()
 
@@ -134,14 +139,14 @@ def plot_posteriors(chi2_array, norm_fac, sed, atlas, truths = [], **kwargs):
                                 labels=pg_labels, truths=corner_truths,
                                 plot_datapoints=False, fill_contours=True,
                                 bins=20, smooth=1.0,
-                                quantiles=(0.16, 0.84), levels=[1 - np.exp(-(1/1)**2/2),1 - np.exp(-(2/1)**2/2)],
+                                quantiles=(0.16, 0.50, 0.84), levels=[1 - np.exp(-(1/1)**2/2),1 - np.exp(-(2/1)**2/2)],
                                 label_kwargs={"fontsize": 30}, show_titles=True, **kwargs)
     else:
         figure = corner.corner(corner_params.T, weights = np.exp(-chi2_array/2),
                                 labels=pg_labels,
                                 plot_datapoints=False, fill_contours=True,
                                 bins=20, smooth=1.0,
-                                quantiles=(0.16, 0.84), levels=[1 - np.exp(-(1/1)**2/2),1 - np.exp(-(2/1)**2/2)],
+                                quantiles=(0.16, 0.50, 0.84), levels=[1 - np.exp(-(1/1)**2/2),1 - np.exp(-(2/1)**2/2)],
                                 label_kwargs={"fontsize": 30}, show_titles=True, **kwargs)
     figure.subplots_adjust(right=1.5,top=1.5)
     return figure
@@ -232,6 +237,174 @@ def plot_SFH_posterior(chi2_array, norm_fac, sed, atlas, truths = [], plot_ci = 
     plt.legend(edgecolor='w', fontsize=18)
     plt.show()
     return
+
+def plot_SFH_posterior_laes(chi2_array, norm_fac, sed, atlas, truths = [], plot_ci = True, sfh_threshold = 0.9, **kwargs):
+    # to be phased out with a newer function
+    set_plot_style()
+
+    #pg_sfhs, pg_Z, pg_Av, pg_z, pg_seds = pg_theta
+    pg_sfhs = atlas['sfh_tuple'].T
+    pg_z = atlas['zval'].ravel()
+
+    weighted_chi2_indices = np.argsort(np.exp(-chi2_array/2))
+    num_sfhs = np.sum(np.exp(-chi2_array[weighted_chi2_indices]/2) > sfh_threshold*(np.exp(-np.amin(chi2_array)/2)))
+
+    temp_sfhs = np.zeros((1000, num_sfhs))
+    temp_times = np.zeros((1000, num_sfhs))
+    rel_likelihoods = np.zeros((num_sfhs,))
+    for i in range(num_sfhs):
+        temp_sfh_tuple = pg_sfhs[0:, weighted_chi2_indices[-(i+1)]].copy()
+        temp_sfh_tuple[0] = temp_sfh_tuple[0] + np.log10(norm_fac)
+        temp_sfh_tuple[1] = temp_sfh_tuple[1] + np.log10(norm_fac)
+        temp_sfhs[0:,i], temp_times[0:,i] = tuple_to_sfh(temp_sfh_tuple, zval = pg_z[weighted_chi2_indices[-(i+1)]])
+        temp_sfhs[0:,i] = np.flip(correct_for_mass_loss(np.flip(temp_sfhs[0:,i],0), temp_times[0:,i], fsps_time, fsps_massloss),0)
+
+        rel_likelihoods[i] = np.exp(-chi2_array[weighted_chi2_indices[-(i+1)]]/2)
+
+    if plot_ci == False:
+        for i in range(num_sfhs):
+            if i == 0:
+                fig = plot_sfh(temp_times[0:,i], temp_sfhs[0:,i], lookback=True, color='k', alpha=rel_likelihoods[i]**3, **kwargs)
+            else:
+                plot_sfh(temp_times[0:,i], temp_sfhs[0:,i], lookback=True, fig = fig, color='k', alpha=rel_likelihoods[i]**3, **kwargs)
+
+    if plot_ci == True:
+        _, temp_common_time = tuple_to_sfh(temp_sfh_tuple, zval = pg_z[np.argmin(chi2_array)])
+        temp_sfhs_splined = np.zeros_like(temp_sfhs)
+        fig = plt.figure(figsize=(12,4))
+        for i in range(num_sfhs):
+            temp_sfhs_splined[0:,i] = np.interp(temp_common_time, temp_times[0:,i], np.flip(temp_sfhs[0:,i],0))
+#         plt.fill_between(temp_common_time, np.nanpercentile(temp_sfhs_splined,18,axis=1),
+#                          np.nanpercentile(temp_sfhs_splined,84,axis=1), color='k', alpha=0.1)
+        qt_array = np.arange(25,76,5)
+        for i in range(5):
+            if i == 0:
+                plt.fill_between(temp_common_time, np.nanpercentile(temp_sfhs_splined,qt_array[i],axis=1),
+                                 np.nanpercentile(temp_sfhs_splined,qt_array[-(i+1)],axis=1), color='k', alpha=0.1,
+                                 label='25-75 CI')
+            else:
+                plt.fill_between(temp_common_time, np.nanpercentile(temp_sfhs_splined,qt_array[i],axis=1),
+                                 np.nanpercentile(temp_sfhs_splined,qt_array[-(i+1)],axis=1), color='k', alpha=0.1)
+
+        plot_sfh(temp_common_time, np.flip(np.nanmedian(temp_sfhs_splined,axis=1),0),
+                       lookback=True, color='k', lw=3, label='median DB-SFH', fig = fig)
+        timeax = np.amax(temp_common_time) - temp_common_time #added
+        sfh = np.flip(np.nanmedian(temp_sfhs_splined,axis=1),0) #added
+#         print(np.nanpercentile(temp_sfhs_splined,49,axis=1))
+    if len(truths) == 2:
+        plot_sfh(truths[0], truths[1], lookback=True, fig = fig, lw=3,label='true SFH')
+        plt.ylim(0,np.amax(truths[1])*1.5)
+    
+    #find peaks  
+    peaks = find_peaks(sfh, height = 0.001, width = 0.001, prominence = 0.05, distance = 100) #threshold = [None, 0.001], height = 0.01*(max(sfh))) 
+
+    sfh_orig = sfh
+    sfh = sfh.tolist()
+    
+    ind_max = sfh.index(max(sfh))
+    
+    now_thresh = 0.2 #most recent 200 million years
+    
+    if timeax[ind_max] <= now_thresh:
+        print("*** Max SFR NOW! ***")
+        plt.vlines(timeax[ind_max], 0, (max(sfh)+0.1*(max(sfh))), zorder = 0, color = "yellow", linewidth = 10)
+        max_sf_now = True
+       
+    if timeax[ind_max] > now_thresh:
+        max_sf_now = False
+        
+    #plot peaks
+    plt.vlines(timeax[ind_max], 0, (max(sfh)+0.1*(max(sfh))), zorder = 2, color = "red", linewidth = 3)   
+#     for ind in peaks[0]:
+#         plt.vlines(timeax[ind], 0, (max(sfh)+0.1*(max(sfh))), zorder = 1, color = "black", linewidth = 3, linestyle = "--")
+        
+#     for peak_height in peaks[1]["peak_heights"]:
+#         print(sfh_orig[timeax == timeax.flat[np.abs(timeax - now_thresh).argmin()]]/peak_height)
+#     print((timeax.flat[np.abs(timeax - now_thresh).argmin()]))
+#     print(sfh_orig[list(timeax).index((timeax.flat[np.abs(timeax - now_thresh).argmin()]))])
+#     print(sfh_orig[ind_max])
+#     print(sfh_orig[list(timeax).index((timeax.flat[np.abs(timeax - now_thresh).argmin()]))]/sfh_orig[ind_max])
+    if sfh_orig[list(timeax).index((timeax.flat[np.abs(timeax - now_thresh).argmin()]))] >= sfh_orig[ind_max]*0.95:
+        print("good")
+
+    plt.xlim(-0.01, max(timeax))
+    
+#     dx = []
+#     i = 0
+#     while i < (len(timeax)-1):
+#         diff = timeax[i+1]-timeax[i]
+#         print(diff)
+#         dx.append(diff)
+#         i = i + 1
+    
+#     print(np.mean(dx))
+
+    area = simpson(sfh, dx=-timeax[1]+timeax[0])
+
+    
+#     np.where(area == 50)
+    
+#     print("total area =", area)
+    
+    past = (np.where(timeax > now_thresh, 1, 0)).astype(bool)
+    plt.fill_between(timeax[timeax<=now_thresh], 0, sfh_orig[timeax<=now_thresh], color='dodgerblue', alpha = 0.3, zorder = 1, label = "'now'")
+    t_24 = 2.66571047663587
+    t_31 = 2.025604247683022
+    t_45 = 1.3081932506898275
+    
+    if narrowband == "n419":
+        plt.vlines(max(timeax)-t_31, 0, 1000, label = "z = 3.1", color = "lime", linewidth = 5)
+        plt.vlines(max(timeax)-t_45, 0, 1000, label = "z = 4.5", color = "hotpink", linewidth = 5)
+    if narrowband == "n501":
+        plt.vlines(max(timeax)-t_45, 0, 1000, label = "z = 4.5", color = "hotpink", linewidth = 5)
+#     print("HERE:", max(timeax))
+    
+#     past = (np.where(timeax > np.maximum(min(timeax[zeros]), now_thresh), 1, 0)).astype(bool)
+#     plt.vlines(np.maximum(min(timeax[zeros]), now_thresh), 0, (max(sfh)+0.1*(max(sfh))), zorder = 1, color = "grey", linewidth = 3, label = "now")
+    
+    area_past = simpson(sfh_orig[past], dx=-timeax[1]+timeax[0])
+#     print("area_past =", area_past)
+    perc_mstar_now = 100 - ((area_past/area)*100)
+    print(round(perc_mstar_now, 2), "% of the total stellar mass was created 'now'.")
+    print(round(100-perc_mstar_now, 2), "% of the total stellar mass was created prior to 'now'.")
+
+    
+    plt.legend(edgecolor='w', fontsize=18)
+    plt.show()
+
+    #################
+
+    figure = plt.figure()
+    area_vals = []
+    times = np.arange(0, max(timeax), (-timeax[1]+timeax[0]))
+    for time_val in times:
+        time = (np.where(timeax > time_val, 1, 0)).astype(bool)
+        area_val = simpson(sfh_orig[time], dx=-timeax[1]+timeax[0])
+        area_vals.append(area_val/area)
+    plt.plot(times, area_vals, color = "black")
+    
+    plt.xlabel("lookback time [Gyr]")
+    plt.ylabel("% of stellar mass created")
+    
+    percs = [25, 50, 75, 95, 100]
+    ts = []
+    
+    for perc in percs:
+        closest_val = min(area_vals, key=lambda x:abs(x-(perc/100)))
+        print("closest:", closest_val)
+        t = (times[area_vals == closest_val])[0]
+        plt.vlines(t, 0, 1, label = "t_{} = {}".format(perc, round(t, 2)))
+        print(t)
+        plt.legend()
+        ts.append(t)
+        
+    t25, t50, t75, t95, t100 = ts
+        
+        
+    
+    #################
+    
+    return fig_sfh, timeax, sfh, max_sf_now, perc_mstar_now, t25, t50, t75, t95, t100
 
 def plot_SFH_posterior_v2(chi2_array, sed, pg_theta, truths = [], plot_ci = True, sfh_threshold = 0.9, Nbins = 30, max_num = 100, npow = 3, **kwargs):
     set_plot_style()
