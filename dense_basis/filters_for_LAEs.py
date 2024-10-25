@@ -44,24 +44,6 @@ def get_filter_name(filter_data):
     filter_name = (((((string.partition('/'))[2]).partition('/'))[2]).partition('.'))[0]
     return filter_name
 
-def get_FWHM(a_filter):
-    filt_transmission_data = get_pkg_data_filename('/Users/nicolefirestone/Desktop/grd_scl/dense_basis/dense_basis/build/lib/dense_basis/filters/' + a_filter)
-
-    wavelength = (np.array([x.split()[0] for x in open(filt_transmission_data).readlines()])).astype(float)
-    transmission = (np.array([x.split()[1] for x in open(filt_transmission_data).readlines()])).astype(float)
-
-    d = transmission - (max(transmission) / 2)
-#     plt.plot(transmission, d)
-    index = np.where(d > 0)[0]
-#     print(index)
-    
-#     figure = plt.figure()
-#     plt.plot(wavelength, transmission)
-#     plt.vlines(wavelength[index[-1]], 0, max(transmission))
-#     plt.vlines(wavelength[index[0]], 0, max(transmission))
-    
-    return wavelength[index[-1]], wavelength[index[0]]
-
 def choose_filters_laes(filter_list, filt_dir, z)
 
   filter_data = np.genfromtxt((filt_dir+filter_list), skip_header=0,skip_footer=0, names=None, dtype=None, delimiter=' ')
