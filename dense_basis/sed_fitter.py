@@ -134,7 +134,9 @@ class SedFit(object):
             spec_all.append(spec_gen)
             z_all.append(self.atlas['zval'][bestn_gals[-(i+1)]])
 
-        
+
+        wave_lya_min = (1 + sedfit.z[1])*1216 #not sure if this gives what I want
+        wave_lya_max = (1 + sedfit.z[2])*1216 #not sure if this gives what I want
         print("wave Lya min:", wave_lya_min)
         print("wave Lya max:", wave_lya_max)
         print("max spec for Lya:", max(np.asarray(spec_all)[np.where((np.where((np.asarray(lam_all) >= wave_lya_min) & (np.asarray(lam_all) <= wave_lya_max), True, False)))]))
@@ -700,7 +702,7 @@ def calculate_50_16_84_params(chi2, nbands, params, norm_fac, nbins = 30, return
 
     dust_median = bin_centers[np.argmin(np.abs(n_c - 0.5))]
     dust_16 = bin_centers[np.argmin(np.abs(n_c - 0.16))]
-    dust_84 = bin_centers[np.argmin(np.abs(n_c - 0.84))]
+    dust_84 = bin_centers[np.argmin(np.abs(n_c - 0.84))]ƒ
     dust_posterior = [n,bins]
 
     [n,bins,] = np.histogram(pg_params[-2,0:],weights=relprob,density=True,bins=nbins)
