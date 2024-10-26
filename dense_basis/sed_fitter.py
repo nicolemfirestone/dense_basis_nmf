@@ -135,8 +135,8 @@ class SedFit(object):
             z_all.append(self.atlas['zval'][bestn_gals[-(i+1)]])
 
 
-        wave_lya_min = (1 + sedfit.z[1])*1216 #not sure if this gives what I want
-        wave_lya_max = (1 + sedfit.z[2])*1216 #not sure if this gives what I want
+        wave_lya_min = (1 + self.z[1])*1216 #not sure if this gives what I want
+        wave_lya_max = (1 + self.z[2])*1216 #not sure if this gives what I want
         print("wave Lya min:", wave_lya_min)
         print("wave Lya max:", wave_lya_max)
         print("max spec for Lya:", max(np.asarray(spec_all)[np.where((np.where((np.asarray(lam_all) >= wave_lya_min) & (np.asarray(lam_all) <= wave_lya_max), True, False)))]))
