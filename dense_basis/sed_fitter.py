@@ -134,6 +134,11 @@ class SedFit(object):
             spec_all.append(spec_gen)
             z_all.append(self.atlas['zval'][bestn_gals[-(i+1)]])
 
+        
+        print("wave Lya min:", wave_lya_min)
+        print("wave Lya max:", wave_lya_max)
+        print("max spec for Lya:", max(np.asarray(spec_all)[np.where((np.where((np.asarray(lam_all) >= wave_lya_min) & (np.asarray(lam_all) <= wave_lya_max), True, False)))]))
+
         fig = plt.subplots(1,1,figsize=figsize)
 
 
