@@ -139,7 +139,7 @@ class SedFit(object):
         wave_lya_max = (1 + self.z[2])*1216 #not sure if this gives what I want
         print("wave Lya min:", wave_lya_min)
         print("wave Lya max:", wave_lya_max)
-        print("max spec for Lya:", max(np.asarray(spec_all)[np.where((np.where((np.asarray(lam_all) >= wave_lya_min) & (np.asarray(lam_all) <= wave_lya_max), True, False)))]))
+        print("max spec for Lya:", max(np.asarray(spec_all*self.norm_fac[np.where((np.where((np.asarray(lam_all*(1+z_all) >= wave_lya_min) & (np.asarray(lam_all*(1+z_all) <= wave_lya_max), True, False)))]))
 
         fig = plt.subplots(1,1,figsize=figsize)
 
@@ -153,7 +153,7 @@ class SedFit(object):
                 wave_lya_max = (1 + self.z[2])*1216 #not sure if this gives what I want
                 print("wave Lya min:", wave_lya_min)
                 print("wave Lya max:", wave_lya_max)
-                print("max spec for Lya:", max(np.asarray(spec_all[i])[np.where((np.where((np.asarray(lam_all[i]) >= wave_lya_min) & (np.asarray(lam_all[i]) <= wave_lya_max), True, False)))]))
+                print("max spec for Lya:", max(np.asarray(spec_all[i]*self.norm_fac[np.where((np.where((np.asarray(lam_all[i]*(1+z_all[i]) >= wave_lya_min) & (np.asarray(lam_all[i]*(1+z_all[i]) <= wave_lya_max), True, False)))]))
             
             plt.errorbar(filt_centers[self.sed>0], self.sed[self.sed>0], yerr=self.sed_err[self.sed>0]*2, color=sedcolor,lw=0, elinewidth=2, marker='o', markersize=12, capsize=5)
             plt.ylabel(r'$F_\nu$ [$\mu$Jy]')
