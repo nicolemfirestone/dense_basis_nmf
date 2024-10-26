@@ -115,4 +115,4 @@ def choose_filters_laes(filter_list, filt_dir, z):
           print(get_filter_name(filt), round(get_eff_wavelength_new(filt, filt_dir), 2))
           omitted_filts_names.append(get_filter_name(filt))
   
-  return filters_use, filters_use_bool
+  return filters_use, filters_use_bool, eff_waves
