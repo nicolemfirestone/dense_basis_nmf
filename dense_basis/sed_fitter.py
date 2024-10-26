@@ -702,7 +702,7 @@ def calculate_50_16_84_params(chi2, nbands, params, norm_fac, nbins = 30, return
 
     dust_median = bin_centers[np.argmin(np.abs(n_c - 0.5))]
     dust_16 = bin_centers[np.argmin(np.abs(n_c - 0.16))]
-    dust_84 = bin_centers[np.argmin(np.abs(n_c - 0.84))]ƒ
+    dust_84 = bin_centers[np.argmin(np.abs(n_c - 0.84))]
     dust_posterior = [n,bins]
 
     [n,bins,] = np.histogram(pg_params[-2,0:],weights=relprob,density=True,bins=nbins)
