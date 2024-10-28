@@ -126,20 +126,20 @@ class SedFit(object):
 
         bestn_gals = np.argsort(self.likelihood)
 
-        for i in range(ngals):
+        # for i in range(ngals):
 
-            lam_gen, spec_gen =  makespec_atlas(self.atlas, bestn_gals[-(i+1)], priors, mocksp, cosmo, filter_list = [], filt_dir = [], return_spec = True)
+        #     lam_gen, spec_gen =  makespec_atlas(self.atlas, bestn_gals[-(i+1)], priors, mocksp, cosmo, filter_list = [], filt_dir = [], return_spec = True)
 
-            lam_all.append(lam_gen)
-            spec_all.append(spec_gen)
-            z_all.append(self.atlas['zval'][bestn_gals[-(i+1)]])
+        #     lam_all.append(lam_gen)
+        #     spec_all.append(spec_gen)
+        #     z_all.append(self.atlas['zval'][bestn_gals[-(i+1)]])
 
 
-        wave_lya_min = (1 + self.z[1])*1216 #not sure if this gives what I want
-        wave_lya_max = (1 + self.z[2])*1216 #not sure if this gives what I want
-        print("wave Lya min:", wave_lya_min)
-        print("wave Lya max:", wave_lya_max)
-        print("max spec for Lya:", max(np.asarray(spec_all*self.norm_fac[np.where((np.where((np.asarray(lam_all*(1+z_all)) >= wave_lya_min) & (np.asarray(lam_all*(1+z_all)) <= wave_lya_max), True, False)))])))
+        # wave_lya_min = (1 + self.z[1])*1216 #not sure if this gives what I want
+        # wave_lya_max = (1 + self.z[2])*1216 #not sure if this gives what I want
+        # print("wave Lya min:", wave_lya_min)
+        # print("wave Lya max:", wave_lya_max)
+        # print("max spec for Lya:", max(np.asarray(spec_all*self.norm_fac[np.where((np.where((np.asarray(lam_all*(1+z_all)) >= wave_lya_min) & (np.asarray(lam_all*(1+z_all)) <= wave_lya_max), True, False)))])))
 
         fig = plt.subplots(1,1,figsize=figsize)
 
