@@ -10,8 +10,8 @@ from .pre_grid import make_filvalkit_simple, load_atlas
 from .gp_sfh import *
 
 def set_plot_style():
-    # sns.set(font_scale=2)
-    # sns.set_style('ticks')
+    sns.set(font_scale=2)
+    sns.set_style('ticks')
 
     rc('axes', linewidth=3)
     rcParams['xtick.major.size'] = 12
