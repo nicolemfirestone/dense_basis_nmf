@@ -307,14 +307,14 @@ def plot_SFH_posterior_laes(chi2_array, norm_fac, sed, atlas, truths = [], plot_
     
     if timeax[ind_max] <= now_thresh:
         print("*** Max SFR NOW! ***")
-        plt.vlines(timeax[ind_max], 0, (max(sfh)+0.1*(max(sfh))), zorder = 0, color = "yellow", linewidth = 10)
+        plt.vlines(timeax[ind_max], 0, (max(sfh)), zorder = 0, color = "yellow", linewidth = 10)
         max_sf_now = True
        
     if timeax[ind_max] > now_thresh:
         max_sf_now = False
         
     #plot peaks
-    plt.vlines(timeax[ind_max], 0, (max(sfh)+0.1*(max(sfh))), zorder = 2, color = "red", linewidth = 3)   
+    plt.vlines(timeax[ind_max], 0, (max(sfh)), zorder = 2, color = "red", linewidth = 3)   
 #     for ind in peaks[0]:
 #         plt.vlines(timeax[ind], 0, (max(sfh)+0.1*(max(sfh))), zorder = 1, color = "black", linewidth = 3, linestyle = "--")
         
