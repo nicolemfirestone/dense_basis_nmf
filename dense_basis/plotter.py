@@ -22,9 +22,9 @@ def set_plot_style():
     rcParams['ytick.major.width'] = 3
 
     #nicole
-    plt.rcParams.update({'font.sans-serif':'Times New Roman'})
-    plt.rcParams.update({'font.weight':'bold'})
-    plt.rcParams.update({'axes.labelweight':'bold'})
+    # plt.rcParams.update({'font.sans-serif':'Times New Roman'})
+    # plt.rcParams.update({'font.weight':'bold'})
+    # plt.rcParams.update({'axes.labelweight':'bold'})
 
 def plot_sfh(timeax, sfh, lookback = False, logx = False, logy = False, fig = None, label=None, **kwargs):
     set_plot_style()
