@@ -116,6 +116,7 @@ class SedFit(object):
         figure = plot_posteriors(self.chi2_array, self.norm_fac, self.sed, self.atlas, truths = truths)
         return figure
 
+
     def plot_posterior_spec(self, filt_centers, priors, ngals = 100, alpha=0.1, fnu=True, yscale='log', speccolor = 'k', sedcolor='b', titlestr = [],figsize=(12,7)):
 
         set_plot_style()
@@ -134,7 +135,57 @@ class SedFit(object):
             spec_all.append(spec_gen)
             z_all.append(self.atlas['zval'][bestn_gals[-(i+1)]])
 
+        fig = plt.subplots(1,1,figsize=figsize)
 
+
+        if fnu == True:
+            for i in range(ngals):
+                plt.plot(lam_all[i]*(1+z_all[i]), spec_all[i]*self.norm_fac, color = speccolor, alpha=alpha)
+            plt.errorbar(filt_centers[self.sed>0], self.sed[self.sed>0], yerr=self.sed_err[self.sed>0]*2, color=sedcolor,lw=0, elinewidth=2, marker='o', markersize=12, capsize=5)
+            plt.ylabel(r'$F_\nu$ [$\mu$Jy]')
+
+        elif fnu == False:
+            for i in range(ngals):
+                spec_flam = ujy_to_flam(spec_all[i]*self.norm_fac, lam_all[i]*(1+z_all[i]))
+                plt.plot(lam_all[i]*(1+z_all[i]), spec_flam, color = speccolor, alpha=alpha)
+            sed_flam = ujy_to_flam(self.sed,filt_centers)
+            sed_flam_err_up = ujy_to_flam(self.sed+self.sed_err,filt_centers) - sed_flam
+            sed_flam_err_dn = sed_flam - ujy_to_flam(self.sed-self.sed_err,filt_centers)
+            # make these F_\lam errors, not F_nu errors
+            plt.errorbar(filt_centers[self.sed>0], sed_flam[self.sed>0], yerr=(sed_flam_err_up[self.sed>0], sed_flam_err_dn[self.sed>0]), color=sedcolor,lw=0, elinewidth=2, marker='o', markersize=12, capsize=5)
+            plt.ylabel(r'$F_\lambda$')
+
+        plt.xlabel(r'$\lambda$ [$\AA$]')
+        plt.xlim(np.amin(filt_centers)*0.81, np.amax(filt_centers)*1.2)
+        plt.ylim(np.amin(self.sed[self.sed>0])*0.8,np.amax(self.sed[self.sed>0]+self.sed_err[self.sed>0])*1.5)
+        plt.xscale('log');plt.yscale(yscale);
+        #plot_lines(filt_centers, gal_z)
+        #plt.title(titlestr,fontsize=18)
+
+        return fig
+    
+    def plot_posterior_spec_laes(self, filt_centers, priors, ngals = 100, alpha=0.1, fnu=True, yscale='log', speccolor = 'k', sedcolor='b', titlestr = [],figsize=(12,7)):
+
+        set_plot_style()
+
+        lam_all = []
+        spec_all = []
+        z_all = []
+
+        bestn_gals = np.argsort(self.likelihood)
+
+        for i in range(ngals):
+
+            lam_gen, spec_gen =  makespec_atlas(self.atlas, bestn_gals[-(i+1)], priors, mocksp, cosmo, filter_list = [], filt_dir = [], return_spec = True)
+
+            lam_all.append(lam_gen)
+            spec_all.append(spec_gen)
+            z_all.append(self.atlas['zval'][bestn_gals[-(i+1)]])
+
+        print(ngals)
+        print(len(lam_all)) 
+        
+        
         # wave_lya_min = (1 + self.z[1])*1216 #not sure if this gives what I want
         # wave_lya_max = (1 + self.z[2])*1216 #not sure if this gives what I want
         # print("wave Lya min:", wave_lya_min)
@@ -146,6 +197,7 @@ class SedFit(object):
 
         if fnu == True:
             for i in range(ngals):
+                print(i)
                 plt.plot(lam_all[i]*(1+z_all[i]), spec_all[i]*self.norm_fac, color = speccolor, alpha=alpha)
 
                 print("\nngal index:", i)
